@@ -128,29 +128,3 @@ function checkIfAllWindowsClosed() {
     });
 }
 
-// Function to clear session data
-function endSession() {
-    console.log("Ending session and clearing data.");
-
-    tabTimes = {};
-    // Clear session-related data to start fresh on the next browser launch
-    chrome.storage.local.set({
-        scrollDistance: 0,
-        scrollDistanceInMeters: 0,
-        mouseDistance: 0,
-        mouseDistanceInMeters: 0,
-        openTabsCount: 0,
-        tabTimes: {}
-    }, () => {
-        console.log("Session data cleared.");
-    });
-}
-
-// Event listener for window close, to check if all windows are closed
-chrome.windows.onRemoved.addListener(checkIfAllWindowsClosed);
-
-// New: Clear lingering data on browser startup
-chrome.runtime.onStartup.addListener(() => {
-    console.log("Browser started; clearing lingering session data.");
-    endSession();
-});

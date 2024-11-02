@@ -61,6 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reset button to clear storage and reset display
     document.getElementById('reset').addEventListener('click', () => {
+
+        // Send reset command to background.js
+        chrome.runtime.sendMessage('resetTabTimes', (response) => {
+            if (response && response.status === 'success') {
+                console.log("tabTimes has been successfully reset.");
+            }
+        });
+
         chrome.storage.local.set({
             scrollDistance: 0,
             scrollDistanceInMeters: 0,
