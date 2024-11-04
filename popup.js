@@ -84,3 +84,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// Refresh button to fetch the latest stats from background.js
+document.getElementById('refresh').addEventListener('click', () => {
+    // Send message to background.js to get the latest stats
+    chrome.runtime.sendMessage('getStats', (response) => {
+        if (response) {
+            displayTabTimes(response.tabTimes); // Update tab times display
+            // You can also update other stats like scrollDistance or mouseDistance here if needed
+        }
+    });
+});
+
+// Function to display tab times in the popup
+function displayTabTimes(tabTimes) {
+    const tabTimesList = document.getElementById('tabTimesList');
+    tabTimesList.innerHTML = ''; // Clear existing tab times
+
+    // Sort and limit to top 5, then display each tab
+    const sortedTabTimes = Object.entries(tabTimes || {})
+        .sort(([, a], [, b]) => b.time - a.time) // Sort by time spent (descending)
+        .slice(0, 5); // Limit to top 5
+
+    for (const [title, { time }] of sortedTabTimes) {
+        const minutes = Math.floor(time / 10000);
+        const seconds = Math.floor((time % 10000) / 1000);
+        const timeDisplay = `${minutes} min ${seconds} sec`;
+
+        const tabInfoDiv = document.createElement('div');
+        tabInfoDiv.classList.add('tab-info');
+        tabInfoDiv.textContent = `${title} - ${timeDisplay}`;
+        tabTimesList.appendChild(tabInfoDiv);
+    }
+}

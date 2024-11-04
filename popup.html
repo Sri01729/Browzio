@@ -99,6 +99,23 @@ body {
     background-color: #38bdf8;
 }
 
+.refresh-btn {
+    margin-left: auto;
+    padding: 5px 10px;
+    font-size: 12px;
+    color: #f8fafc;
+    background-color: #7dd3fc;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.refresh-btn:hover {
+    background-color: #38bdf8;
+}
+
+
     </style>
 </head>
 
@@ -120,6 +137,7 @@ body {
                 <p id="openTabsCount">Active Tabs: 0</p>
                 <div class="header">
                     <p class="title">Top 5 Tabs(Auto-refreshes every minute)</p>
+                    <button id="refresh" class="refresh-btn">Refresh</button>
                 </div>
                 <div id="tabTimesList"></div>
             </div>
