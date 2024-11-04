@@ -1,5 +1,7 @@
 let activeTabId = null;
 let tabTimes = {}; // Store time spent and title for each tab
+let lastActiveTime = Date.now(); // New variable for tracking the last active time
+
 
 // Function to update the open tabs count
 function updateOpenTabsCount() {
@@ -13,13 +15,14 @@ function updateOpenTabsCount() {
 // Function to save time spent on a tab, along with its title
 function saveTabTime(tabId, url, timeSpent) {
     try {
-        const domain = new URL(url).hostname.replace("www.", ""); // Get the domain name
+        const domain = new URL(url).hostname.replace("www.", ""); // Extract domain
 
         if (!tabTimes[domain]) {
             tabTimes[domain] = { title: domain, time: 0 }; // Use domain as the key
         }
 
-        tabTimes[domain].time += timeSpent; // Accumulate time for the domain
+        // Accumulate time for the domain
+        tabTimes[domain].time += timeSpent;
     } catch (error) {
         console.error("Invalid URL:", url, error);
     }
@@ -29,18 +32,18 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     const now = Date.now();
 
     if (activeTabId !== null) {
-        const timeSpent = now - (tabTimes._lastActive || now);
+        const timeSpent = now - lastActiveTime; // Use lastActiveTime instead
 
         chrome.tabs.get(activeTabId, (tab) => {
             if (tab) {
-                saveTabTime(activeTabId, tab.url, timeSpent); // Pass the URL
+                saveTabTime(activeTabId, tab.url, timeSpent); // Save time for the previous tab
                 console.log(`Domain ${new URL(tab.url).hostname}`);
             }
         });
     }
 
-    activeTabId = activeInfo.tabId;
-    tabTimes._lastActive = now;
+    activeTabId = activeInfo.tabId; // Update active tab
+    lastActiveTime = now; // Update last active time
     updateOpenTabsCount();
 });
 

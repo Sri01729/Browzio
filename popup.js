@@ -103,12 +103,13 @@ function displayTabTimes(tabTimes) {
 
     // Sort and limit to top 5, then display each tab
     const sortedTabTimes = Object.entries(tabTimes || {})
+        .filter(([key]) => key !== "_lastActive") // Ensure _lastActive is not included
         .sort(([, a], [, b]) => b.time - a.time) // Sort by time spent (descending)
         .slice(0, 5); // Limit to top 5
 
     for (const [title, { time }] of sortedTabTimes) {
-        const minutes = Math.floor(time / 10000);
-        const seconds = Math.floor((time % 10000) / 1000);
+        const minutes = Math.floor(time / 60000);
+        const seconds = Math.floor((time % 60000) / 1000);
         const timeDisplay = `${minutes} min ${seconds} sec`;
 
         const tabInfoDiv = document.createElement('div');
