@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, () => {
             document.getElementById('scrollDistance').textContent = `Scroll Distance: 0 meters`;
             document.getElementById('mouseDistance').textContent = `Mouse Distance: 0 meters`;
-            document.getElementById('openTabsCount').textContent = `Current Open Tabs: 0`;
+            document.getElementById('openTabsCount').textContent = `Active Tabs: 0`;
             document.getElementById('tabTimesList').innerHTML = '';
         });
     });
@@ -87,12 +87,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Refresh button to fetch the latest stats from background.js
 document.getElementById('refresh').addEventListener('click', () => {
+
+    const spinner = document.getElementById('spinner');
+
+    // Add the fast animation class
+    spinner.classList.add('fast');
+
     // Send message to background.js to get the latest stats
     chrome.runtime.sendMessage('getStats', (response) => {
         if (response) {
             displayTabTimes(response.tabTimes); // Update tab times display
             // You can also update other stats like scrollDistance or mouseDistance here if needed
         }
+
+        // Remove the fast class after a delay to reset the animation
+        setTimeout(() => {
+            spinner.classList.remove('fast'); // Reset to normal speed
+        }, 3000); // Match the duration of the fast animation
+
     });
 });
 

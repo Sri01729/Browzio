@@ -123,7 +123,7 @@ body {
   height: 10.4px;
   --clr: #38bdf8;
   --clr-alpha: rgb(247, 197, 159,.1);
-  animation: spinner 3.6s infinite ease;
+  animation: spinner 9.6s infinite ease;
   transform-style: preserve-3d;
 }
 
@@ -176,6 +176,11 @@ body {
     transform: rotate(45deg) rotateX(-385deg) rotateY(385deg);
   }
 }
+
+.spinner.fast {
+  animation: spinner 1.5s infinite ease; /* Speed up animation for 1.5 seconds */
+}
+
     </style>
 </head>
 
@@ -185,7 +190,7 @@ body {
         <div class="card">
             <div class="header">
                 <p class="title">Activity Stats</p>
-                <div class="spinner">
+                <div class="spinner" id="spinner">
                     <div></div>
                     <div></div>
                     <div></div>
