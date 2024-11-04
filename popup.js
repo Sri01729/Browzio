@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
         tabTimesList.innerHTML = ''; // Clear previous entries
 
         if (data.tabTimes) {
-            // Create a dictionary to store the highest time for each tab title
             const maxTimes = {};
 
             for (const [tabId, tabInfo] of Object.entries(data.tabTimes)) {
@@ -39,72 +38,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 .sort(([, a], [, b]) => b.time - a.time) // Sort by time
                 .slice(0, 5); // Limit to top 5
 
-            // Clear existing elements in tabTimesList
-            tabTimesList.innerHTML = '';
-
-            // Display only the top 5 tabs
             for (const [title, { time }] of sortedMaxTimes) {
                 const minutes = Math.floor(time / 60000);
                 const seconds = Math.floor((time % 60000) / 1000);
                 const timeDisplay = `${minutes} min ${seconds} sec`;
 
-                // Create a new element for each of the top 5 entries
                 const tabInfoDiv = document.createElement('div');
                 tabInfoDiv.classList.add('tab-info');
-                tabInfoDiv.textContent = `${title} -  ${timeDisplay}`;
+                tabInfoDiv.textContent = `${title} - ${timeDisplay}`;
                 tabTimesList.appendChild(tabInfoDiv);
             }
         }
-
-
     });
 
     // Reset button to clear storage and reset display
     document.getElementById('reset').addEventListener('click', () => {
-
         // Send reset command to background.js
-        chrome.runtime.sendMessage('resetTabTimes', (response) => {
+        chrome.runtime.sendMessage('resetData', (response) => {
             if (response && response.status === 'success') {
                 console.log("tabTimes has been successfully reset.");
+                // Update UI after reset
+                document.getElementById('scrollDistance').textContent = `Scroll Distance: 0 meters`;
+                document.getElementById('mouseDistance').textContent = `Mouse Distance: 0 meters`;
+                document.getElementById('openTabsCount').textContent = `Active Tabs: 0`;
+                document.getElementById('tabTimesList').innerHTML = ''; // Clear displayed tab times
             }
         });
-
-        chrome.storage.local.set({
-            scrollDistance: 0,
-            scrollDistanceInMeters: 0,
-            mouseDistance: 0,
-            mouseDistanceInMeters: 0,
-            openTabsCount: 0,
-            tabTimes: {}
-        }, () => {
-            document.getElementById('scrollDistance').textContent = `Scroll Distance: 0 meters`;
-            document.getElementById('mouseDistance').textContent = `Mouse Distance: 0 meters`;
-            document.getElementById('openTabsCount').textContent = `Active Tabs: 0`;
-            document.getElementById('tabTimesList').innerHTML = '';
-        });
     });
-});
 
-// Refresh button to fetch the latest stats from background.js
-document.getElementById('refresh').addEventListener('click', () => {
+    // Refresh button to fetch the latest stats from background.js
+    document.getElementById('refresh').addEventListener('click', () => {
+        const spinner = document.getElementById('spinner');
+        // Add the fast animation class
+        spinner.classList.add('fast');
 
-    const spinner = document.getElementById('spinner');
-
-    // Add the fast animation class
-    spinner.classList.add('fast');
-
-    // Send message to background.js to get the latest stats
-    chrome.runtime.sendMessage('getStats', (response) => {
-        if (response) {
-            displayTabTimes(response.tabTimes); // Update tab times display
-            // You can also update other stats like scrollDistance or mouseDistance here if needed
-        }
-
-        // Remove the fast class after a delay to reset the animation
-        setTimeout(() => {
-            spinner.classList.remove('fast'); // Reset to normal speed
-        }, 3000); // Match the duration of the fast animation
-
+        // Send message to background.js to get the latest stats
+        chrome.runtime.sendMessage('getStats', (response) => {
+            if (response) {
+                displayTabTimes(response.tabTimes); // Update tab times display
+            }
+            // Remove the fast class after a delay to reset the animation
+            setTimeout(() => {
+                spinner.classList.remove('fast'); // Reset to normal speed
+            }, 3000); // Match the duration of the fast animation
+        });
     });
 });
 

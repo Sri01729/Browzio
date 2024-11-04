@@ -1,7 +1,6 @@
 let activeTabId = null;
 let tabTimes = {}; // Store time spent and title for each tab
-let lastActiveTime = Date.now(); // New variable for tracking the last active time
-
+let lastActiveTime = Date.now(); // Variable for tracking the last active time
 
 // Function to update the open tabs count
 function updateOpenTabsCount() {
@@ -32,7 +31,7 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
     const now = Date.now();
 
     if (activeTabId !== null) {
-        const timeSpent = now - lastActiveTime; // Use lastActiveTime instead
+        const timeSpent = now - lastActiveTime; // Calculate time spent on the previous tab
 
         chrome.tabs.get(activeTabId, (tab) => {
             if (tab) {
@@ -81,6 +80,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
         return true; // Keeps the message channel open for async response
     }
+
+    if (message === 'resetData') {
+        endSession(); // Clear all stats on reset
+        sendResponse({ status: 'success' });
+    }
 });
 
 // Helper to check if all windows are closed
@@ -98,6 +102,7 @@ function endSession() {
     console.log("Ending session and clearing data.");
 
     tabTimes = {}; // Clear in-memory tabTimes
+    // Clear session-related data to start fresh on the next browser launch
     chrome.storage.local.set({
         scrollDistance: 0,
         scrollDistanceInMeters: 0,
