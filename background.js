@@ -14,18 +14,27 @@ function updateOpenTabsCount() {
 // Function to save time spent on a tab, along with its title
 function saveTabTime(tabId, url, timeSpent) {
     try {
-        const domain = new URL(url).hostname.replace("www.", ""); // Extract domain
+        // Check if the URL is valid and not empty
+        if (!url) {
+            return; // Skip saving for tabs with no URL
+        }
 
-        if (!tabTimes[domain]) {
-            tabTimes[domain] = { title: domain, time: 0 }; // Use domain as the key
+        // Extract the domain name from the URL
+        const title = new URL(url).hostname.replace("www.", ""); // Remove "www." for consistency
+
+        // Check if the domain entry exists in tabTimes; if not, create it
+        if (!tabTimes[title]) {
+            tabTimes[title] = { title: title, time: 0 };
         }
 
         // Accumulate time for the domain
-        tabTimes[domain].time += timeSpent;
+        tabTimes[title].time += timeSpent; // Only accumulate time for valid URLs
     } catch (error) {
         console.error("Invalid URL:", url, error);
     }
 }
+
+
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
     const now = Date.now();

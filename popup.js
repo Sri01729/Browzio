@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const [tabId, tabInfo] of Object.entries(data.tabTimes)) {
                 if (tabId === "_lastActive") continue; // Skip helper property
 
-                const title = tabInfo.title || "Unknown Tab";
+                const title = tabInfo.title || (tabInfo.url ? new URL(tabInfo.url).hostname : "Empty Tab");
                 const currentTime = tabInfo.time;
 
                 // Track the maximum time per title
@@ -90,13 +90,18 @@ function displayTabTimes(tabTimes) {
     const tabTimesList = document.getElementById('tabTimesList');
     tabTimesList.innerHTML = ''; // Clear existing tab times
 
-    // Sort and limit to top 5, then display each tab
     const sortedTabTimes = Object.entries(tabTimes || {})
         .filter(([key]) => key !== "_lastActive") // Ensure _lastActive is not included
-        .sort(([, a], [, b]) => b.time - a.time) // Sort by time spent (descending)
-        .slice(0, 5); // Limit to top 5
+        .sort(([, a], [, b]) => b.time - a.time); // Sort by time spent (descending)
 
-    for (const [title, { time }] of sortedTabTimes) {
+    // Determine the number of tabs to display (minimum of 5 or the total number of tabs)
+    const tabsToDisplay = sortedTabTimes.slice(0, Math.min(5, sortedTabTimes.length));
+
+    // Filter out tabs without a valid title before displaying
+    const filteredTabs = tabsToDisplay.filter(([title]) => title && title.trim() !== '');
+
+    // Iterate over the filtered tab times to display them
+    for (const [title, { time }] of filteredTabs) {
         const minutes = Math.floor(time / 60000);
         const seconds = Math.floor((time % 60000) / 1000);
         const timeDisplay = `${minutes} min ${seconds} sec`;
