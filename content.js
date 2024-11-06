@@ -1,7 +1,11 @@
 // Track typing
 // Confirm script is running
 console.log("Content script loaded and listening for events");
-
+function logExtensionUrl() {
+    const url = browser.runtime.getURL("icons/icon16.png");
+    console.log("Extension URL:", url);
+}
+logExtensionUrl();
 let wordCount = 0;
 document.addEventListener('keydown', (event) => {
     // Increase word count only for character keys

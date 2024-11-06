@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browzio Authentication</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
+    <script type="module" src="auth.js" defer></script>
+    <style>
+        /* Base Styles */
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8037e;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* Center vertically */
+            width: 100%;
+            /* Full width */
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            /* Center items vertically */
+            justify-content: center;
+            /* Center items horizontally */
+            min-width: 300px;
+            /* Set minimum width for the popup */
+            max-height: 800px;
+            /* Max height for the popup to avoid excessive resizing */
+            overflow-y: auto;
+            /* Enable scrolling when content exceeds max height */
+            padding: 10px;
+        }
+
+        .wrapper {
+            --input-focus: #38bdf8;
+            --font-color: #38bdf8;
+            --font-color-sub: #666;
+            --bg-color: #fff;
+            --bg-color-alt: #0f172a;
+            --main-color: #7dd3fc;
+            width: 360px;
+            /* Set fixed width */
+            background-color: #3b1e2f;
+            /* Card background */
+            border-radius: 10px;
+            /* Rounded corners */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            /* Shadow for depth */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            /* Space between elements */
+            padding: 20px;
+            /* Padding inside the wrapper */
+        }
+
+
+        /* Switch card styles */
+        .card-switch {
+            position: relative;
+
+        }
+
+        /* Card-side labels for log in and sign up */
+        .card-side {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+            /* Space below labels */
+        }
+
+        .card-side::before {
+            content: 'Log in';
+            text-decoration: underline;
+            color: var(--font-color);
+            font-weight: 600;
+        }
+
+        .card-side::after {
+            content: 'Sign up';
+            text-decoration: none;
+            color: var(--font-color);
+            font-weight: 600;
+        }
+
+        /* Toggle styles */
+        .toggle {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* Slider styles */
+        .slider {
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 2px solid var(--main-color);
+            box-shadow: 4px 4px var(--main-color);
+            position: absolute;
+            cursor: pointer;
+            top: 20px;
+            /* Position it between the labels */
+            left: 50%;
+            /* Center the slider horizontally */
+            transform: translateX(-50%);
+            /* Center alignment */
+            width: 100px;
+            /* Set width of the slider */
+            height: 20px;
+            /* Set height of the slider */
+            background-color: var(--bg-color);
+            transition: 0.3s;
+        }
+
+        .slider:before {
+            box-sizing: border-box;
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            border: 2px solid var(--main-color);
+            border-radius: 5px;
+            left: -2px;
+            /* Position of the knob */
+            bottom: 2px;
+            background-color: var(--bg-color);
+            box-shadow: 0 3px 0 var(--main-color);
+            transition: 0.3s;
+        }
+
+        .toggle:checked+.slider {
+            background-color: var(--input-focus);
+        }
+
+        .toggle:checked+.slider:before {
+            transform: translateX(30px);
+        }
+
+
+        .flip-card__inner {
+            width: 100%;
+            /* Full width */
+            height: 350px;
+            /* Fixed height */
+            position: relative;
+            perspective: 1000px;
+            /* 3D effect */
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            display: flex;
+            /* Allow flex behavior */
+        }
+
+        .toggle:checked~.flip-card__inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card__front,
+        .flip-card__back {
+            padding: 20px;
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            backface-visibility: hidden;
+            background: #1e293b;
+            gap: 20px;
+            border-radius: 5px;
+            border: 2px solid var(--main-color);
+            box-shadow: 4px 4px var(--main-color);
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+        }
+
+        .flip-card__back {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card__form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .title {
+            margin: 20px 0 20px 0;
+            font-size: 25px;
+            font-weight: 900;
+            text-align: center;
+            color: var(--main-color);
+        }
+
+        .flip-card__input {
+            width: 250px;
+            height: 40px;
+            border-radius: 5px;
+            border: 2px solid var(--main-color);
+            background-color: var(--bg-color);
+            box-shadow: 4px 4px var(--main-color);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--font-color);
+            padding: 5px 10px;
+            outline: none;
+        }
+
+        .flip-card__input::placeholder {
+            color: var(--font-color-sub);
+            opacity: 0.8;
+        }
+
+        .flip-card__input:focus {
+            border: 2px solid var(--input-focus);
+        }
+
+        .flip-card__btn:active,
+        .button-confirm:active {
+            box-shadow: 0px 0px var(--main-color);
+            transform: translate(3px, 3px);
+        }
+
+        .flip-card__btn {
+            margin: 20px 0 20px 0;
+            width: 120px;
+            height: 40px;
+            border-radius: 5px;
+            border: 2px solid var(--main-color);
+            background-color: var(--bg-color);
+            box-shadow: 4px 4px var(--main-color);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--font-color);
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="wrapper">
+            <div class="card-switch">
+                <label class="switch">
+                    <input type="checkbox" class="toggle">
+                    <span class="slider"></span>
+                    <span class="card-side"></span>
+                    <div class="flip-card__inner">
+                        <div class="flip-card__front">
+                            <div class="title">Log in</div>
+                            <form id="signInForm" class="flip-card__form">
+                                <input class="flip-card__input" id="signInEmail" placeholder="Email" type="email"
+                                    required>
+                                <input class="flip-card__input" id="signInPassword" placeholder="Password"
+                                    type="password" required>
+                                <button type="submit" class="flip-card__btn">Let`s go!</button>
+                            </form>
+                        </div>
+                        <div class="flip-card__back">
+                            <div class="title">Sign up</div>
+                            <form id="signUpForm" class="flip-card__form">
+                                <input class="flip-card__input" id="signUpName" placeholder="Name" type="text" required>
+                                <input class="flip-card__input" id="signUpEmail" placeholder="Email" type="email"
+                                    required>
+                                <input class="flip-card__input" id="signUpPassword" placeholder="Password"
+                                    type="password" required>
+                                <button type="submit" class="flip-card__btn">Confirm!</button>
+                            </form>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

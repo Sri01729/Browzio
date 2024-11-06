@@ -66,11 +66,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+   
     // Refresh button to fetch the latest stats from background.js
     document.getElementById('refresh').addEventListener('click', () => {
         const spinner = document.getElementById('spinner');
         // Add the fast animation class
         spinner.classList.add('fast');
+
+        logExtensionUrl();
 
         // Send message to background.js to get the latest stats
         chrome.runtime.sendMessage('getStats', (response) => {
@@ -112,3 +115,4 @@ function displayTabTimes(tabTimes) {
         tabTimesList.appendChild(tabInfoDiv);
     }
 }
+
