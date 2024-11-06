@@ -42,6 +42,7 @@ document.getElementById('signInForm').addEventListener('submit', async (e) => {
     e.preventDefault(); // Prevent default form submission
     const email = document.getElementById('signInEmail').value;
     const password = document.getElementById('signInPassword').value;
+    console.log(email+"\n"+password);
 
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
